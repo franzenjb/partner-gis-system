@@ -508,6 +508,88 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* ARC Approval Process */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">American Red Cross Approval Requirements</h2>
+          <p className="text-gray-600 mb-6">
+            This system includes AI integration (Claude API) and uses non-standard technology stack components.
+            Production deployment would require formal approval through ARC governance processes.
+          </p>
+
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+            <div className="flex items-start gap-3">
+              <svg className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 className="font-semibold text-red-800 text-lg mb-2">Governance Review Required</h3>
+                <p className="text-red-700 text-sm">
+                  This project falls outside standard ARC-approved software and would require review by the
+                  IT Architecture Review Board (ARB) and AI Governance Council (AIGC) before production use.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-800">Required Approval Steps</h3>
+            </div>
+            <div className="divide-y divide-gray-100">
+              <ApprovalStep
+                step={1}
+                title="ARB Submission"
+                description="Submit request to IT Architecture Review Board via Enterprise Architecture portal on OneSource. ARB ensures alignment with enterprise systems and risk mitigation."
+              />
+              <ApprovalStep
+                step={2}
+                title="AI Governance Council Review"
+                description="Because this system includes Claude API integration, it requires AIGC review via IT Customer Portal. Must check AI Model Inventory for existing solutions first."
+              />
+              <ApprovalStep
+                step={3}
+                title="Third-Party Risk Assessment"
+                description="External services (Claude API, OpenRouteService, SendGrid) require Supply Management procurement process, including hallucination risk, model bias, and cybersecurity assessments."
+              />
+              <ApprovalStep
+                step={4}
+                title="Data Classification"
+                description="Technical Owner must assess against IT Procedure – Data Classification. Partner data may include PII requiring elevated security controls."
+              />
+              <ApprovalStep
+                step={5}
+                title="Security Exception (if needed)"
+                description="If tech stack cannot meet ARC Information Security Standards, formal exception required through IT Compliance Exception and Risk Acceptance Process (ERAP), reviewed by CISO."
+              />
+              <ApprovalStep
+                step={6}
+                title="Final Approval & Deployment"
+                description="Upon AIGC approval, Enterprise Data & Analytics manages deployment. Technical Owner responsible for ongoing monitoring, drift detection, and versioning."
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-5">
+            <h4 className="font-semibold text-blue-800 mb-2">Key Stakeholders for Approval</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+              <div>
+                <ul className="space-y-1">
+                  <li>• IT Architecture Review Board (ARB)</li>
+                  <li>• AI Governance Council (AIGC)</li>
+                  <li>• Chief Information Security Officer (CISO)</li>
+                </ul>
+              </div>
+              <div>
+                <ul className="space-y-1">
+                  <li>• IT Governance, Risk & Compliance (GRC)</li>
+                  <li>• Office of General Counsel (OGC)</li>
+                  <li>• Enterprise Data & Analytics</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="border-t border-gray-200 pt-8 pb-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
@@ -784,5 +866,28 @@ function EffortRow({
       <td className="px-4 py-2 text-right text-gray-600">{hours}</td>
       <td className="px-4 py-2 text-gray-500 text-xs hidden md:table-cell">{notes}</td>
     </tr>
+  )
+}
+
+// Approval Step Component
+function ApprovalStep({
+  step,
+  title,
+  description
+}: {
+  step: number
+  title: string
+  description: string
+}) {
+  return (
+    <div className="px-6 py-4 flex gap-4">
+      <div className="flex-shrink-0 w-8 h-8 bg-rc-red rounded-full flex items-center justify-center text-white font-bold text-sm">
+        {step}
+      </div>
+      <div>
+        <h4 className="font-medium text-gray-800">{title}</h4>
+        <p className="text-sm text-gray-600 mt-1">{description}</p>
+      </div>
+    </div>
   )
 }
