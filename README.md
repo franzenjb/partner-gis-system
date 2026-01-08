@@ -1,5 +1,13 @@
 # Partner GIS System
 
+> **⚠️ PROJECT DISCONTINUED**
+>
+> This project is no longer being actively pursued. It was developed as a proof-of-concept demonstration for the American Red Cross but will not be moving forward to production. The codebase remains available for reference purposes.
+>
+> **Demo**: https://franzenjb.github.io/partner-gis-system/
+
+---
+
 A full-stack GIS platform for managing community partner networks, tracking impact metrics, analyzing network connectivity, and coordinating disaster response. Built as an open-source alternative to ArcGIS Online with enhanced network analysis capabilities.
 
 ## Features
