@@ -15,7 +15,7 @@ export default function NetworkPage() {
   })
 
   // Fetch network analysis
-  const { data: analysis, isLoading: analysisLoading } = useQuery({
+  const { data: analysis } = useQuery({
     queryKey: ['network', 'analysis'],
     queryFn: () => networkApi.getAnalysis(),
   })
@@ -26,16 +26,16 @@ export default function NetworkPage() {
 
     // Transform data for Cytoscape
     const elements = [
-      ...graphData.nodes.map((n) => ({
+      ...graphData.nodes.map((n: { data: { id: string; label: string; type: string; partner_id: string } }) => ({
         data: {
           ...n.data,
           // Size based on centrality if available
           size:
-            analysis?.node_analysis.find((a) => a.partner_id === n.data.id)
+            analysis?.node_analysis.find((a: { partner_id: string; degree_centrality: number }) => a.partner_id === n.data.id)
               ?.degree_centrality || 0.1,
         },
       })),
-      ...graphData.edges.map((e) => ({
+      ...graphData.edges.map((e: { data: Record<string, unknown> }) => ({
         data: e.data,
       })),
     ]
@@ -109,7 +109,7 @@ export default function NetworkPage() {
 
   // Get selected node details
   const selectedNodeAnalysis = selectedNode
-    ? analysis?.node_analysis.find((n) => n.partner_id === selectedNode)
+    ? analysis?.node_analysis.find((n: { partner_id: string }) => n.partner_id === selectedNode)
     : null
 
   return (
@@ -225,7 +225,7 @@ export default function NetworkPage() {
                 Most central partners connecting different parts of the network
               </p>
               <div className="space-y-2">
-                {analysis.key_bridges.slice(0, 5).map((partner, i) => (
+                {analysis.key_bridges.slice(0, 5).map((partner: { partner_id: string; partner_name: string; betweenness_centrality: number }, i: number) => (
                   <div
                     key={partner.partner_id}
                     className="p-2 bg-gray-50 rounded text-sm cursor-pointer hover:bg-gray-100"
@@ -259,7 +259,7 @@ export default function NetworkPage() {
                 Partners with no network connections
               </p>
               <div className="space-y-1">
-                {analysis.isolated_nodes.slice(0, 5).map((partner) => (
+                {analysis.isolated_nodes.slice(0, 5).map((partner: { partner_id: string; partner_name: string }) => (
                   <div
                     key={partner.partner_id}
                     className="p-2 bg-red-50 rounded text-sm cursor-pointer hover:bg-red-100"
@@ -280,7 +280,7 @@ export default function NetworkPage() {
                 Groups of closely connected partners
               </p>
               <div className="space-y-2">
-                {analysis.communities.map((comm) => (
+                {analysis.communities.map((comm: { id: number; size: number }) => (
                   <div key={comm.id} className="p-2 bg-gray-50 rounded">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-gray-700">Community {comm.id + 1}</span>

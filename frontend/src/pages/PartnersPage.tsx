@@ -11,7 +11,7 @@ export default function PartnersPage() {
   // Fetch partners
   const { data: partners, isLoading } = useQuery({
     queryKey: ['partners'],
-    queryFn: () => partnersApi.list(false), // Include inactive
+    queryFn: () => partnersApi.list(),
   })
 
   // Fetch service categories for the form
@@ -36,8 +36,8 @@ export default function PartnersPage() {
     enabled: !!selectedPartnerId,
   })
 
-  const handleCreatePartner = (data: Record<string, unknown>) => {
-    createMutation.mutate(data)
+  const handleCreatePartner = (data: unknown) => {
+    createMutation.mutate(data as Record<string, unknown>)
   }
 
   return (
@@ -65,7 +65,7 @@ export default function PartnersPage() {
           <div className="p-4 text-center text-gray-500">Loading...</div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {partners?.map((partner) => (
+            {partners?.map((partner: { id: string; organization_name: string; organization_type?: string; physical_address?: string; is_active: boolean }) => (
               <div
                 key={partner.id}
                 onClick={() => setSelectedPartnerId(partner.id)}

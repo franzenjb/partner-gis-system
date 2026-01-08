@@ -32,8 +32,8 @@ export default function MapPage() {
     map.current = new maplibregl.Map({
       container: mapContainer.current,
       style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
-      center: [-98.5795, 39.8283], // US center
-      zoom: 4,
+      center: [-122.2, 37.8], // Northern California (Bay Area)
+      zoom: 8,
     })
 
     map.current.addControl(new maplibregl.NavigationControl(), 'top-right')

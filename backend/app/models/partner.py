@@ -1,14 +1,16 @@
 """Partner Core Profile - Layer 1 (Primary Point Feature Layer)."""
 import uuid
+import os
 from datetime import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import Optional
 from sqlalchemy import String, Text, Boolean, Integer, Float, DateTime, Enum as SQLEnum
-from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from geoalchemy2 import Geometry
 
 from ..database import Base
+
+# Check if using PostgreSQL
+IS_POSTGRES = "postgresql" in os.getenv("DATABASE_URL", "sqlite")
 
 
 class OrganizationType(str, Enum):
@@ -56,9 +58,9 @@ class Partner(Base):
 
     __tablename__ = "partners"
 
-    # Identity
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    # Identity - use String for SQLite compatibility
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid.uuid4())
     )
     partner_id: Mapped[str] = mapped_column(
         String(50), unique=True, index=True, nullable=False
@@ -69,14 +71,11 @@ class Partner(Base):
     alternate_names: Mapped[Optional[str]] = mapped_column(Text)
     mission_statement: Mapped[Optional[str]] = mapped_column(Text)
     year_founded: Mapped[Optional[int]] = mapped_column(Integer)
-    organization_type: Mapped[OrganizationType] = mapped_column(
-        SQLEnum(OrganizationType), default=OrganizationType.NONPROFIT
+    organization_type: Mapped[str] = mapped_column(
+        String(50), default="nonprofit"
     )
 
-    # Location - PostGIS Point Geometry
-    location: Mapped[Optional[str]] = mapped_column(
-        Geometry(geometry_type="POINT", srid=4326)
-    )
+    # Location - simple lat/lng (no PostGIS for SQLite compatibility)
     physical_address: Mapped[Optional[str]] = mapped_column(Text)
     mailing_address: Mapped[Optional[str]] = mapped_column(Text)
     latitude: Mapped[Optional[float]] = mapped_column(Float)
@@ -92,34 +91,28 @@ class Partner(Base):
     website: Mapped[Optional[str]] = mapped_column(String(500))
     social_media: Mapped[Optional[str]] = mapped_column(Text)  # JSON string
 
-    # Population Served (multi-select stored as array)
-    populations_served: Mapped[Optional[List[str]]] = mapped_column(ARRAY(String))
+    # Population Served (JSON string for SQLite compatibility)
+    populations_served: Mapped[Optional[str]] = mapped_column(Text)  # JSON array
 
     # Geographic Service Area
-    geographic_service_area: Mapped[ServiceAreaType] = mapped_column(
-        SQLEnum(ServiceAreaType), default=ServiceAreaType.SITE_BASED
+    geographic_service_area: Mapped[str] = mapped_column(
+        String(50), default="site_based"
     )
 
     # Physical Capacity
-    facility_types: Mapped[Optional[List[str]]] = mapped_column(ARRAY(String))
+    facility_types: Mapped[Optional[str]] = mapped_column(Text)  # JSON array
     approx_square_footage: Mapped[Optional[int]] = mapped_column(Integer)
-    ada_accessible: Mapped[AccessibilityLevel] = mapped_column(
-        SQLEnum(AccessibilityLevel), default=AccessibilityLevel.NO
-    )
-    parking_available: Mapped[AccessibilityLevel] = mapped_column(
-        SQLEnum(AccessibilityLevel), default=AccessibilityLevel.NO
-    )
+    ada_accessible: Mapped[str] = mapped_column(String(20), default="no")
+    parking_available: Mapped[str] = mapped_column(String(20), default="no")
     transit_access: Mapped[bool] = mapped_column(Boolean, default=False)
     internet_access: Mapped[bool] = mapped_column(Boolean, default=False)
-    backup_power: Mapped[Optional[str]] = mapped_column(String(50))  # none/generator/solar/other
+    backup_power: Mapped[Optional[str]] = mapped_column(String(50))
 
-    # Languages offered (multi-select)
-    languages_offered: Mapped[Optional[List[str]]] = mapped_column(ARRAY(String))
+    # Languages offered (JSON string for SQLite)
+    languages_offered: Mapped[Optional[str]] = mapped_column(Text)  # JSON array
 
     # Status & Metadata
-    approval_status: Mapped[ApprovalStatus] = mapped_column(
-        SQLEnum(ApprovalStatus), default=ApprovalStatus.PENDING
-    )
+    approval_status: Mapped[str] = mapped_column(String(20), default="pending")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(

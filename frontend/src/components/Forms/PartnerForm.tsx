@@ -18,7 +18,7 @@ interface PartnerFormData {
 }
 
 interface PartnerFormProps {
-  onSubmit: (data: Record<string, unknown>) => void
+  onSubmit: (data: PartnerFormData) => void
   isLoading?: boolean
   initialData?: Partial<PartnerFormData>
   categories?: Record<string, string[]>

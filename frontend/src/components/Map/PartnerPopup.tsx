@@ -77,7 +77,7 @@ export default function PartnerPopup({ partner, onClose }: PartnerPopupProps) {
           <div className="mb-4">
             <h4 className="text-xs font-medium text-gray-500 uppercase mb-2">Services</h4>
             <div className="flex flex-wrap gap-1">
-              {services.map((service) => (
+              {services.map((service: { id: string; service_type: string }) => (
                 <span
                   key={service.id}
                   className="px-2 py-1 bg-rc-red/10 text-rc-red text-xs rounded-full"

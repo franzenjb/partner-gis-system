@@ -50,10 +50,10 @@ export const useAppStore = create<AppState>((set) => ({
   selectedPartner: null,
   setSelectedPartner: (partner) => set({ selectedPartner: partner }),
 
-  // Map state - default to US center
-  mapCenter: [-98.5795, 39.8283],
+  // Map state - default to Northern California (Bay Area)
+  mapCenter: [-122.2, 37.8],
   setMapCenter: (center) => set({ mapCenter: center }),
-  mapZoom: 4,
+  mapZoom: 8,
   setMapZoom: (zoom) => set({ mapZoom: zoom }),
 
   // Filters

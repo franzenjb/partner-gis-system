@@ -1,229 +1,389 @@
-import axios from 'axios'
-import type {
-  Partner,
-  PartnerListItem,
-  Service,
-  PartnerMetrics,
-  NetworkGraph,
-  NetworkAnalysis,
-  DisasterCapability,
-  DisasterStatus,
-  GeoJSONCollection,
-  SearchParams,
-  SearchResult,
-} from '../types'
+/**
+ * API Client - Uses mock data for demo, real API when backend is available
+ */
+import {
+  mockPartners,
+  mockServices,
+  mockPartnersGeoJSON,
+  mockServiceCategories,
+  mockMetricsSummary,
+  mockNetworkAnalysis,
+  mockNetworkEdges,
+  mockDisasterDashboard,
+  mockCoverage,
+  mockEquity,
+  mockReadiness,
+} from './mockData'
 
-const api = axios.create({
-  baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
+// Demo mode - use mock data (for GitHub Pages)
+const USE_MOCK_DATA = true
 
 // Partners
 export const partnersApi = {
-  list: async (activeOnly = true): Promise<PartnerListItem[]> => {
-    const { data } = await api.get('/partners', { params: { active_only: activeOnly } })
-    return data
+  list: async () => {
+    if (USE_MOCK_DATA) return mockPartners
+    const res = await fetch('/api/partners')
+    return res.json()
   },
 
-  getGeoJSON: async (): Promise<GeoJSONCollection> => {
-    const { data } = await api.get('/partners/geojson')
-    return data
+  getGeoJSON: async () => {
+    if (USE_MOCK_DATA) return mockPartnersGeoJSON
+    const res = await fetch('/api/partners/geojson')
+    return res.json()
   },
 
-  get: async (id: string): Promise<Partner> => {
-    const { data } = await api.get(`/partners/${id}`)
-    return data
+  get: async (id: string) => {
+    if (USE_MOCK_DATA) {
+      const partner = mockPartners.find((p) => p.id === id)
+      return partner || mockPartners[0]
+    }
+    const res = await fetch(`/api/partners/${id}`)
+    return res.json()
   },
 
-  create: async (partner: Partial<Partner>): Promise<Partner> => {
-    const { data } = await api.post('/partners', partner)
-    return data
+  create: async (partner: Record<string, unknown>) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock create partner:', partner)
+      return { ...partner, id: String(Date.now()), partner_id: `PTR-${Date.now()}` }
+    }
+    const res = await fetch('/api/partners', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(partner),
+    })
+    return res.json()
   },
 
-  update: async (id: string, partner: Partial<Partner>): Promise<Partner> => {
-    const { data } = await api.put(`/partners/${id}`, partner)
-    return data
+  update: async (id: string, partner: Record<string, unknown>) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock update partner:', id, partner)
+      return partner
+    }
+    const res = await fetch(`/api/partners/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(partner),
+    })
+    return res.json()
   },
 
-  delete: async (id: string): Promise<void> => {
-    await api.delete(`/partners/${id}`)
+  delete: async (id: string) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock delete partner:', id)
+      return
+    }
+    await fetch(`/api/partners/${id}`, { method: 'DELETE' })
   },
 
-  approve: async (id: string): Promise<void> => {
-    await api.post(`/partners/${id}/approve`)
+  approve: async (id: string) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock approve partner:', id)
+      return
+    }
+    await fetch(`/api/partners/${id}/approve`, { method: 'POST' })
   },
 }
 
 // Services
 export const servicesApi = {
-  list: async (partnerId?: string): Promise<Service[]> => {
-    const params = partnerId ? { partner_id: partnerId } : {}
-    const { data } = await api.get('/services', { params })
-    return data
+  list: async (partnerId?: string) => {
+    if (USE_MOCK_DATA) {
+      if (partnerId) {
+        return mockServices.filter((s) => s.partner_id === partnerId)
+      }
+      return mockServices
+    }
+    const params = partnerId ? `?partner_id=${partnerId}` : ''
+    const res = await fetch(`/api/services${params}`)
+    return res.json()
   },
 
-  getCategories: async (): Promise<Record<string, string[]>> => {
-    const { data } = await api.get('/services/categories')
-    return data
+  getCategories: async () => {
+    if (USE_MOCK_DATA) return mockServiceCategories
+    const res = await fetch('/api/services/categories')
+    return res.json()
   },
 
-  create: async (service: Partial<Service>): Promise<Service> => {
-    const { data } = await api.post('/services', service)
-    return data
+  create: async (service: Record<string, unknown>) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock create service:', service)
+      return service
+    }
+    const res = await fetch('/api/services', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(service),
+    })
+    return res.json()
   },
 }
 
 // Metrics
 export const metricsApi = {
-  list: async (partnerId?: string): Promise<PartnerMetrics[]> => {
-    const params = partnerId ? { partner_id: partnerId } : {}
-    const { data } = await api.get('/metrics', { params })
-    return data
+  list: async () => {
+    if (USE_MOCK_DATA) return []
+    const res = await fetch('/api/metrics')
+    return res.json()
   },
 
-  getSummary: async (partnerId?: string): Promise<Record<string, { total: number; count: number; average: number }>> => {
-    const params = partnerId ? { partner_id: partnerId } : {}
-    const { data } = await api.get('/metrics/summary', { params })
-    return data
+  getSummary: async () => {
+    if (USE_MOCK_DATA) return mockMetricsSummary
+    const res = await fetch('/api/metrics/summary')
+    return res.json()
   },
 
-  getTimeseries: async (metricType: string, partnerId?: string) => {
-    const params: Record<string, string> = { metric_type: metricType }
-    if (partnerId) params.partner_id = partnerId
-    const { data } = await api.get('/metrics/timeseries', { params })
-    return data
+  getTimeseries: async () => {
+    if (USE_MOCK_DATA) return []
+    const res = await fetch('/api/metrics/timeseries')
+    return res.json()
   },
 
-  create: async (metrics: Partial<PartnerMetrics>): Promise<PartnerMetrics> => {
-    const { data } = await api.post('/metrics', metrics)
-    return data
+  create: async (metrics: Record<string, unknown>) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock create metrics:', metrics)
+      return metrics
+    }
+    const res = await fetch('/api/metrics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(metrics),
+    })
+    return res.json()
   },
 }
 
 // Network
 export const networkApi = {
-  getGraph: async (context?: string): Promise<NetworkGraph> => {
-    const params = context ? { context } : {}
-    const { data } = await api.get('/network/graph', { params })
-    return data
+  getGraph: async () => {
+    if (USE_MOCK_DATA) {
+      return {
+        nodes: mockPartners.map((p) => ({
+          data: {
+            id: p.id,
+            label: p.organization_name,
+            type: p.organization_type,
+            partner_id: p.partner_id,
+          },
+        })),
+        edges: mockNetworkEdges.map((e) => ({
+          data: {
+            id: e.id,
+            source: e.partner_a_id,
+            target: e.partner_b_id,
+            relationship: e.relationship_type,
+            strength: e.relationship_strength,
+            context: e.relationship_context,
+          },
+        })),
+        summary: {
+          total_nodes: mockPartners.length,
+          total_edges: mockNetworkEdges.length,
+        },
+      }
+    }
+    const res = await fetch('/api/network/graph')
+    return res.json()
   },
 
-  getAnalysis: async (context?: string): Promise<{
-    node_analysis: NetworkAnalysis[]
-    network_metrics: Record<string, number>
-    communities: Array<{ id: number; members: string[]; size: number }>
-    isolated_nodes: NetworkAnalysis[]
-    key_bridges: NetworkAnalysis[]
-  }> => {
-    const params = context ? { context } : {}
-    const { data } = await api.get('/network/analysis', { params })
-    return data
+  getAnalysis: async () => {
+    if (USE_MOCK_DATA) return mockNetworkAnalysis
+    const res = await fetch('/api/network/analysis')
+    return res.json()
   },
 
   getPartnerConnections: async (partnerId: string) => {
-    const { data } = await api.get(`/network/partner/${partnerId}/connections`)
-    return data
+    if (USE_MOCK_DATA) {
+      const connections = mockNetworkEdges.filter(
+        (e) => e.partner_a_id === partnerId || e.partner_b_id === partnerId
+      )
+      return {
+        partner_id: partnerId,
+        total_connections: connections.length,
+        connections,
+      }
+    }
+    const res = await fetch(`/api/network/partner/${partnerId}/connections`)
+    return res.json()
   },
 
-  createEdge: async (edge: Partial<NetworkGraph['edges'][0]['data']>) => {
-    const { data } = await api.post('/network/edges', edge)
-    return data
+  createEdge: async (edge: Record<string, unknown>) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock create edge:', edge)
+      return edge
+    }
+    const res = await fetch('/api/network/edges', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(edge),
+    })
+    return res.json()
   },
 }
 
 // Disaster
 export const disasterApi = {
-  getCapabilities: async (partnerId?: string): Promise<DisasterCapability[]> => {
-    const params = partnerId ? { partner_id: partnerId } : {}
-    const { data } = await api.get('/disaster/capabilities', { params })
-    return data
+  getCapabilities: async () => {
+    if (USE_MOCK_DATA) return []
+    const res = await fetch('/api/disaster/capabilities')
+    return res.json()
   },
 
   getCapabilitiesSummary: async () => {
-    const { data } = await api.get('/disaster/capabilities/summary')
-    return data
+    if (USE_MOCK_DATA) return mockDisasterDashboard.capabilities_by_type
+    const res = await fetch('/api/disaster/capabilities/summary')
+    return res.json()
   },
 
-  getStatus: async (eventName?: string): Promise<DisasterStatus[]> => {
-    const params = eventName ? { event_name: eventName } : {}
-    const { data } = await api.get('/disaster/status', { params })
-    return data
+  getStatus: async () => {
+    if (USE_MOCK_DATA) return []
+    const res = await fetch('/api/disaster/status')
+    return res.json()
   },
 
-  getActiveEvents: async (): Promise<{ active_events: string[] }> => {
-    const { data } = await api.get('/disaster/status/events')
-    return data
+  getActiveEvents: async () => {
+    if (USE_MOCK_DATA) return { active_events: ['2024 Wildfire Season'] }
+    const res = await fetch('/api/disaster/status/events')
+    return res.json()
   },
 
-  getDashboard: async (eventName?: string) => {
-    const params = eventName ? { event_name: eventName } : {}
-    const { data } = await api.get('/disaster/dashboard', { params })
-    return data
+  getDashboard: async () => {
+    if (USE_MOCK_DATA) return mockDisasterDashboard
+    const res = await fetch('/api/disaster/dashboard')
+    return res.json()
   },
 
-  createStatus: async (status: Partial<DisasterStatus>): Promise<DisasterStatus> => {
-    const { data } = await api.post('/disaster/status', status)
-    return data
+  createStatus: async (status: Record<string, unknown>) => {
+    if (USE_MOCK_DATA) {
+      console.log('Mock create status:', status)
+      return status
+    }
+    const res = await fetch('/api/disaster/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(status),
+    })
+    return res.json()
   },
 }
 
 // Search
 export const searchApi = {
-  partners: async (params: SearchParams): Promise<SearchResult> => {
-    const { data } = await api.get('/search/partners', { params })
-    return data
+  partners: async (params: { q?: string; service_category?: string }) => {
+    if (USE_MOCK_DATA) {
+      let results = [...mockPartners]
+      if (params.q) {
+        const q = params.q.toLowerCase()
+        results = results.filter(
+          (p) =>
+            p.organization_name.toLowerCase().includes(q) ||
+            p.physical_address?.toLowerCase().includes(q)
+        )
+      }
+      if (params.service_category) {
+        const partnerIds = mockServices
+          .filter((s) => s.category === params.service_category)
+          .map((s) => s.partner_id)
+        results = results.filter((p) => partnerIds.includes(p.id))
+      }
+      return {
+        count: results.length,
+        offset: 0,
+        limit: 50,
+        results,
+      }
+    }
+    const res = await fetch('/api/search/partners?' + new URLSearchParams(params as Record<string, string>))
+    return res.json()
   },
 
   nearby: async (lat: number, lng: number, radiusMiles = 5) => {
-    const { data } = await api.get('/search/nearby', {
-      params: { lat, lng, radius_miles: radiusMiles },
-    })
-    return data
+    if (USE_MOCK_DATA) {
+      // Simple distance filter
+      const results = mockPartners.filter((p) => {
+        if (!p.latitude || !p.longitude) return false
+        const dist = Math.sqrt(Math.pow(p.latitude - lat, 2) + Math.pow(p.longitude - lng, 2))
+        return dist < radiusMiles / 50 // Rough approximation
+      })
+      return {
+        search_location: { lat, lng },
+        radius_miles: radiusMiles,
+        count: results.length,
+        results,
+      }
+    }
+    const res = await fetch(`/api/search/nearby?lat=${lat}&lng=${lng}&radius_miles=${radiusMiles}`)
+    return res.json()
   },
 
-  services: async (params: SearchParams) => {
-    const { data } = await api.get('/search/services', { params })
-    return data
+  services: async () => {
+    if (USE_MOCK_DATA) return { count: mockServices.length, results: mockServices }
+    const res = await fetch('/api/search/services')
+    return res.json()
   },
 }
 
 // Analysis
 export const analysisApi = {
   getCoverage: async () => {
-    const { data } = await api.get('/analysis/coverage')
-    return data
+    if (USE_MOCK_DATA) return mockCoverage
+    const res = await fetch('/api/analysis/coverage')
+    return res.json()
   },
 
   getGaps: async () => {
-    const { data } = await api.get('/analysis/gaps')
-    return data
+    if (USE_MOCK_DATA) {
+      return {
+        analysis_type: 'service_gap_analysis',
+        sample_gaps: [
+          {
+            area_name: 'East Oakland',
+            svi_score: 0.82,
+            gap_severity: 'high',
+            missing_services: ['mental_health_support', 'utility_assistance'],
+          },
+          {
+            area_name: 'North Bay Rural',
+            svi_score: 0.65,
+            gap_severity: 'medium',
+            missing_services: ['food_pantry', 'transportation'],
+          },
+        ],
+      }
+    }
+    const res = await fetch('/api/analysis/gaps')
+    return res.json()
   },
 
   getEquity: async () => {
-    const { data } = await api.get('/analysis/equity')
-    return data
+    if (USE_MOCK_DATA) return mockEquity
+    const res = await fetch('/api/analysis/equity')
+    return res.json()
   },
 
-  getImpactSummary: async (partnerId?: string) => {
-    const params = partnerId ? { partner_id: partnerId } : {}
-    const { data } = await api.get('/analysis/impact-summary', { params })
-    return data
+  getImpactSummary: async () => {
+    if (USE_MOCK_DATA) return { metrics: mockMetricsSummary }
+    const res = await fetch('/api/analysis/impact-summary')
+    return res.json()
   },
 
-  getReadinessScore: async (partnerId?: string) => {
-    const params = partnerId ? { partner_id: partnerId } : {}
-    const { data } = await api.get('/analysis/readiness-score', { params })
-    return data
+  getReadinessScore: async () => {
+    if (USE_MOCK_DATA) return mockReadiness
+    const res = await fetch('/api/analysis/readiness-score')
+    return res.json()
   },
 
-  aiSummarize: async (prompt: string, partnerId?: string) => {
-    const { data } = await api.post('/analysis/ai/summarize', null, {
-      params: { prompt, partner_id: partnerId },
+  aiSummarize: async (prompt: string) => {
+    if (USE_MOCK_DATA) {
+      return {
+        summary: `AI Summary (Demo Mode): Based on the Northern California partner network of ${mockPartners.length} organizations, the network shows strong disaster coordination capabilities. Key insights: The Bay Area Disaster Relief Coalition serves as a critical hub with highest betweenness centrality. Recommendations include expanding services in high-SVI areas of East Oakland and increasing mental health support in fire-affected North Bay regions.`,
+        context_used: prompt,
+      }
+    }
+    const res = await fetch('/api/analysis/ai/summarize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
     })
-    return data
+    return res.json()
   },
 }
-
-export default api

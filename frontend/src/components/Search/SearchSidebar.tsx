@@ -27,7 +27,6 @@ export default function SearchSidebar({ categories }: SearchSidebarProps) {
       searchApi.partners({
         q: searchQuery || undefined,
         service_category: serviceFilter as ServiceCategory | undefined,
-        limit: 50,
       }),
     enabled: searchQuery.length > 0 || !!serviceFilter,
   })
@@ -98,7 +97,7 @@ export default function SearchSidebar({ categories }: SearchSidebarProps) {
 
         {searchResults?.results && searchResults.results.length > 0 ? (
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {searchResults.results.map((partner) => (
+            {searchResults.results.map((partner: { id: string; organization_name: string; physical_address?: string; organization_type?: string }) => (
               <div
                 key={partner.id}
                 className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"

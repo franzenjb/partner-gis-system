@@ -7,7 +7,7 @@ export default function AdminPage() {
   // Fetch partners needing approval
   const { data: partners } = useQuery({
     queryKey: ['partners', 'all'],
-    queryFn: () => partnersApi.list(false),
+    queryFn: () => partnersApi.list(),
   })
 
   // Fetch readiness score
@@ -25,7 +25,7 @@ export default function AdminPage() {
   })
 
   const pendingPartners = partners?.filter(
-    (p) => !p.is_active || p.organization_type === 'pending'
+    (p: { is_active: boolean; organization_type: string }) => !p.is_active || p.organization_type === 'pending'
   )
 
   return (
@@ -45,7 +45,7 @@ export default function AdminPage() {
             <div className="p-4">
               {pendingPartners && pendingPartners.length > 0 ? (
                 <div className="space-y-3">
-                  {pendingPartners.map((partner) => (
+                  {pendingPartners.map((partner: { id: string; organization_name: string; organization_type?: string }) => (
                     <div
                       key={partner.id}
                       className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"

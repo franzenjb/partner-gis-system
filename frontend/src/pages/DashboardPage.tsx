@@ -10,8 +10,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
 } from 'recharts'
 import { analysisApi, metricsApi, disasterApi } from '../api/client'
 import { useAppStore } from '../store/appStore'
