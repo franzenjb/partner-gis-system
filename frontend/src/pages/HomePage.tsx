@@ -306,6 +306,108 @@ export default function HomePage() {
           </p>
         </section>
 
+        {/* Development Effort Estimates */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Development Effort Estimates</h2>
+          <p className="text-gray-600 mb-6">
+            Estimated man-hours to transform this prototype into a production-ready system.
+          </p>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-white rounded-lg shadow p-5 border-l-4 border-amber-500">
+              <div className="text-sm text-gray-500 mb-1">Minimum Viable Product</div>
+              <div className="text-2xl font-bold text-gray-800">300-400 hrs</div>
+              <div className="text-sm text-gray-500 mt-1">8-10 weeks (1 FTE)</div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-5 border-l-4 border-blue-500">
+              <div className="text-sm text-gray-500 mb-1">Full Production System</div>
+              <div className="text-2xl font-bold text-gray-800">460-670 hrs</div>
+              <div className="text-sm text-gray-500 mt-1">12-17 weeks (1 FTE)</div>
+            </div>
+            <div className="bg-white rounded-lg shadow p-5 border-l-4 border-green-500">
+              <div className="text-sm text-gray-500 mb-1">With Polish & Edge Cases</div>
+              <div className="text-2xl font-bold text-gray-800">600-800 hrs</div>
+              <div className="text-sm text-gray-500 mt-1">15-20 weeks (1 FTE)</div>
+            </div>
+          </div>
+
+          {/* Detailed Breakdown Table */}
+          <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600">Phase</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600">Component</th>
+                  <th className="px-4 py-3 text-right font-semibold text-gray-600">Hours</th>
+                  <th className="px-4 py-3 text-left font-semibold text-gray-600 hidden md:table-cell">Notes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                <EffortRow phase="1. Database & Core API" component="" hours="80-120" notes="" isHeader />
+                <EffortRow phase="" component="PostgreSQL/PostGIS schema design" hours="16-24" notes="8 tables with relationships" />
+                <EffortRow phase="" component="FastAPI endpoints (full CRUD)" hours="40-60" notes="~50 endpoints across all models" />
+                <EffortRow phase="" component="Authentication & RBAC" hours="24-36" notes="JWT, roles, permissions" />
+
+                <EffortRow phase="2. Data Collection System" component="" hours="100-150" notes="" isHeader />
+                <EffortRow phase="" component="Partner registration wizard" hours="40-60" notes="Multi-step form, validation, geocoding" />
+                <EffortRow phase="" component="Admin approval queue" hours="16-24" notes="Review workflow, notifications" />
+                <EffortRow phase="" component="CSV bulk import" hours="16-24" notes="Parsing, validation, error handling" />
+                <EffortRow phase="" component="Quarterly metrics forms" hours="24-40" notes="Recurring submission, reminders" />
+
+                <EffortRow phase="3. Maps & Visualization" component="" hours="80-120" notes="" isHeader />
+                <EffortRow phase="" component="Service area polygon editor" hours="32-48" notes="Draw tools, save/edit polygons" />
+                <EffortRow phase="" component="SVI/vulnerability overlays" hours="24-32" notes="Data processing, styling, legends" />
+                <EffortRow phase="" component="Drive-time isochrones" hours="24-40" notes="OpenRouteService integration" />
+
+                <EffortRow phase="4. Network Analysis" component="" hours="40-60" notes="" isHeader />
+                <EffortRow phase="" component="Relationship data entry UI" hours="16-24" notes="Partner linking interface" />
+                <EffortRow phase="" component="Enhanced network metrics" hours="16-24" notes="Community detection, recommendations" />
+                <EffortRow phase="" component="Visualization polish" hours="8-12" notes="Filtering, export, legends" />
+
+                <EffortRow phase="5. Dashboards & Reporting" component="" hours="60-80" notes="" isHeader />
+                <EffortRow phase="" component="Real dashboard data integration" hours="24-32" notes="Replace mock data" />
+                <EffortRow phase="" component="PDF/CSV export" hours="16-24" notes="Report generation" />
+                <EffortRow phase="" component="Equity analysis views" hours="16-24" notes="SVI correlation analysis" />
+
+                <EffortRow phase="6. AI Integration" component="" hours="40-60" notes="" isHeader />
+                <EffortRow phase="" component="Claude API integration" hours="16-24" notes="API setup, prompt engineering" />
+                <EffortRow phase="" component="Partner summaries" hours="12-18" notes="Auto-generated narratives" />
+                <EffortRow phase="" component="Gap analysis" hours="12-18" notes="AI-powered insights" />
+
+                <EffortRow phase="7. Automation & Polish" component="" hours="60-80" notes="" isHeader />
+                <EffortRow phase="" component="Email system (SendGrid)" hours="16-24" notes="Templates, triggers" />
+                <EffortRow phase="" component="Quarterly reminder automation" hours="16-24" notes="Scheduling, tracking" />
+                <EffortRow phase="" component="Disaster activation workflow" hours="16-24" notes="Mode switching, notifications" />
+                <EffortRow phase="" component="Mobile optimization" hours="8-16" notes="Responsive fixes" />
+              </tbody>
+              <tfoot className="bg-gray-50 font-semibold">
+                <tr>
+                  <td colSpan={2} className="px-4 py-3 text-gray-800">Total Estimated Range</td>
+                  <td className="px-4 py-3 text-right text-rc-red">460-670 hrs</td>
+                  <td className="px-4 py-3 text-gray-600 hidden md:table-cell">Full production system</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          {/* Variables Section */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-5">
+            <h3 className="font-semibold text-amber-800 mb-3">Key Variables That Affect Estimates</h3>
+            <ul className="text-sm text-amber-700 space-y-2">
+              <li><strong>Data complexity</strong> — How clean is the incoming partner data? Manual cleanup adds significant time</li>
+              <li><strong>Integration requirements</strong> — Are there existing systems to integrate with?</li>
+              <li><strong>User testing cycles</strong> — Feedback loops can add 20-30% to estimates</li>
+              <li><strong>Documentation requirements</strong> — User guides, admin docs, training materials</li>
+              <li><strong>Deployment environment</strong> — Self-hosted vs cloud vs existing infrastructure</li>
+            </ul>
+            <p className="text-sm text-amber-600 mt-4 pt-3 border-t border-amber-200">
+              <strong>Note:</strong> This demo represents roughly <strong>60-80 hours</strong> of work (UI scaffolding, mock data, basic routing).
+              The production delta is primarily in data persistence, validation, and real integrations.
+            </p>
+          </div>
+        </section>
+
         {/* Development Phases */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Development Roadmap</h2>
@@ -648,5 +750,39 @@ function DataLayerCard({
       <h4 className="font-medium text-gray-800 text-sm">{title}</h4>
       <p className="text-xs text-gray-500 mt-1">{desc}</p>
     </div>
+  )
+}
+
+// Effort Row Component for man-hours table
+function EffortRow({
+  phase,
+  component,
+  hours,
+  notes,
+  isHeader = false
+}: {
+  phase: string
+  component: string
+  hours: string
+  notes: string
+  isHeader?: boolean
+}) {
+  if (isHeader) {
+    return (
+      <tr className="bg-gray-50">
+        <td className="px-4 py-2 font-semibold text-gray-800">{phase}</td>
+        <td className="px-4 py-2 text-gray-600"></td>
+        <td className="px-4 py-2 text-right font-semibold text-rc-red">{hours}</td>
+        <td className="px-4 py-2 text-gray-500 hidden md:table-cell">{notes}</td>
+      </tr>
+    )
+  }
+  return (
+    <tr>
+      <td className="px-4 py-2 text-gray-400">{phase}</td>
+      <td className="px-4 py-2 text-gray-700 pl-6">{component}</td>
+      <td className="px-4 py-2 text-right text-gray-600">{hours}</td>
+      <td className="px-4 py-2 text-gray-500 text-xs hidden md:table-cell">{notes}</td>
+    </tr>
   )
 }
