@@ -29,6 +29,18 @@ export default function Layout() {
                 }`
               }
             >
+              Home
+            </NavLink>
+            <NavLink
+              to="/map"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-rc-red text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`
+              }
+            >
               Map
             </NavLink>
             <NavLink
